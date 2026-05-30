@@ -191,6 +191,39 @@
                             <!-- /.nav-second-level -->
                         </li>
                     {% endif %}
+                    {% if perms.sql.menu_resource %}
+                        <li>
+                            <a href="#"><i class="fa fa-server fa-fw"></i> 资源管理<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                {% if perms.sql.menu_idc %}
+                                    <li>
+                                        <a href="/resource/idc/">机房管理</a>
+                                    </li>
+                                {% endif %}
+                                {% if perms.sql.menu_server %}
+                                    <li>
+                                        <a href="/resource/server/">服务器管理</a>
+                                    </li>
+                                {% endif %}
+                                {% if perms.sql.menu_project %}
+                                    <li>
+                                        <a href="/resource/project/">项目管理</a>
+                                    </li>
+                                {% endif %}
+                                {% if perms.sql.menu_cluster %}
+                                    <li>
+                                        <a href="/resource/cluster/">集群管理</a>
+                                    </li>
+                                {% endif %}
+                                {% if perms.sql.resource_instance_view %}
+                                    <li>
+                                        <a href="/resource/instance/">实例关联</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                            <!-- /.nav-second-level -->
+                        </li>
+                    {% endif %}
                     {% if perms.sql.menu_tools %}
                         <li>
                             <a href="#"><i class="fa fa-plug fa-fw"></i> 工具插件<span class="fa arrow"></span></a>

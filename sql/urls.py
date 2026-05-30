@@ -9,7 +9,7 @@ import sql.sql_optimize
 from common import auth, config, workflow, dashboard, check
 from common.twofa import totp
 from sql import views, sql_workflow, sql_analyze, query, slowlog, instance, instance_account, db_diagnostic, \
-    resource_group, binlog, data_dictionary, archiver, audit_log, user
+    resource_group, binlog, data_dictionary, archiver, audit_log, user, resource_management
 from sql.utils import tasks
 from common.utils import ding_api
 
@@ -162,4 +162,14 @@ urlpatterns = [
     path('audit/input/', audit_log.audit_input),
     path('user/list/', user.lists),
     path('user/qrcode/<str:data>/', totp.generate_qrcode),
+
+    # ==================== 资源管理模块 URL 开始 ====================
+    path('resource/idc/', resource_management.idc_list, name='idc_list'),
+    path('resource/server/', resource_management.server_list, name='server_list'),
+    path('resource/project/', resource_management.project_list, name='project_list'),
+    path('resource/cluster/', resource_management.cluster_list, name='cluster_list'),
+    path('resource/instance/', resource_management.resource_instance_list, name='resource_instance_list'),
+    path('resource/instance/edit/<int:resource_instance_id>/', resource_management.resource_instance_edit, name='resource_instance_edit'),
+    path('resource/instance/add/', resource_management.resource_instance_edit, name='resource_instance_add'),
+    # ==================== 资源管理模块 URL 结束 ====================
 ]

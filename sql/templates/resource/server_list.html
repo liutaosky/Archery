@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <!-- 搜索栏 -->
+    <div id="toolbar" class="form-inline pull-left">
+        <div class="form-group">
+            <select id="idc_id" class="form-control selectpicker">
+                <option value="">全部机房</option>
+                {% for idc in idc_list %}
+                    <option value="{{ idc.idc_id }}" {% if idc_id == idc.idc_id %}selected{% endif %}>{{ idc.idc_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <input type="text" id="keyword" class="form-control" placeholder="服务器名称/IP" value="{{ keyword|default_if_none:'' }}">
+        </div>
+        <div class="form-group">
+            <button id="btn_search" type="button" class="btn btn-default" onclick="searchServer()">
+                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                搜索
+            </button>
+        </div>
+        <div class="form-group">
+            <button id="btn_add" type="button" class="btn btn-default"
+                    onclick="window.open('/admin/sql/server/add/')">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                添加服务器
+            </button>
+        </div>
+    </div>
+
+    <!-- 表格 -->
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>服务器名称</th>
+                    <th>服务器IP</th>
+                    <th>内网IP</th>
+                    <th>SSH端口</th>
+                    <th>所属机房</th>
+                    <th>CPU</th>
+                    <th>内存</th>
+                    <th>磁盘</th>
+                    <th>操作系统</th>
+                    <th>状态</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for server in server_list %}
+                    <tr>
+                        <td>{{ server.server_id }}</td>
+                        <td>{{ server.server_name }}</td>
+                        <td>{{ server.server_ip }}</td>
+                        <td>{{ server.server_inner_ip|default:'-' }}</td>
+                        <td>{{ server.server_port }}</td>
+                        <td>{{ server.idc.idc_name }}</td>
+                        <td>{{ server.server_cpu|default:'-' }}</td>
+                        <td>{{ server.server_memory|default:'-' }}</td>
+                        <td>{{ server.server_disk|default:'-' }}</td>
+                        <td>{{ server.server_os|default:'-' }}</td>
+                        <td>
+                            {% if server.server_status == 1 %}
+                                <span class="label label-success">在线</span>
+                            {% elif server.server_status == 2 %}
+                                <span class="label label-warning">维护</span>
+                            {% else %}
+                                <span class="label label-default">离线</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ server.create_time|date:'Y-m-d H:i:s' }}</td>
+                        <td>
+                            <button type="button" class="btn btn-xs btn-primary"
+                                    onclick="window.open('/admin/sql/server/{{ server.server_id }}/change/')">
+                                编辑
+                            </button>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="13" class="text-center">暂无数据</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 分页 -->
+    {% if server_list.has_other_pages %}
+        <ul class="pagination">
+            {% if server_list.has_previous %}
+                <li><a href="?page={{ server_list.previous_page_number }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if idc_id %}&idc_id={{ idc_id }}{% endif %}">&laquo;</a></li>
+            {% else %}
+                <li class="disabled"><span>&laquo;</span></li>
+            {% endif %}
+            {% for i in server_list.paginator.page_range %}
+                {% if server_list.number == i %}
+                    <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                {% else %}
+                    <li><a href="?page={{ i }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if idc_id %}&idc_id={{ idc_id }}{% endif %}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if server_list.has_next %}
+                <li><a href="?page={{ server_list.next_page_number }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if idc_id %}&idc_id={{ idc_id }}{% endif %}">&raquo;</a></li>
+            {% else %}
+                <li class="disabled"><span>&raquo;</span></li>
+            {% endif %}
+        </ul>
+    {% endif %}
+{% endblock content %}
+
+{% block js %}
+    <script>
+        function searchServer() {
+            var keyword = $('#keyword').val();
+            var idc_id = $('#idc_id').val();
+            var url = window.location.pathname;
+            var params = {};
+            if (keyword) {
+                params.keyword = keyword;
+            }
+            if (idc_id) {
+                params.idc_id = idc_id;
+            }
+            window.location.href = url + '?' + $.param(params);
+        }
+    </script>
+{% endblock js %}

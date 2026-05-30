@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <!-- 搜索栏 -->
+    <div id="toolbar" class="form-inline pull-left">
+        <div class="form-group">
+            <select id="idc_id" class="form-control selectpicker">
+                <option value="">全部机房</option>
+                {% for idc in idc_list %}
+                    <option value="{{ idc.idc_id }}" {% if idc_id == idc.idc_id %}selected{% endif %}>{{ idc.idc_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <select id="project_id" class="form-control selectpicker">
+                <option value="">全部项目</option>
+                {% for project in project_list %}
+                    <option value="{{ project.project_id }}" {% if project_id == project.project_id %}selected{% endif %}>{{ project.project_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <input type="text" id="keyword" class="form-control" placeholder="实例名称" value="{{ keyword|default_if_none:'' }}">
+        </div>
+        <div class="form-group">
+            <button id="btn_search" type="button" class="btn btn-default" onclick="searchResourceInstance()">
+                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                搜索
+            </button>
+        </div>
+        <div class="form-group">
+            <button id="btn_add" type="button" class="btn btn-default"
+                    onclick="window.open('/admin/sql/resourceinstance/add/')">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                关联实例
+            </button>
+        </div>
+    </div>
+
+    <!-- 表格 -->
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>实例名称</th>
+                    <th>数据库类型</th>
+                    <th>所属机房</th>
+                    <th>所属服务器</th>
+                    <th>所属集群</th>
+                    <th>所属项目</th>
+                    <th>环境类型</th>
+                    <th>重要级别</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for resource_instance in resource_instance_list %}
+                    <tr>
+                        <td>{{ resource_instance.resource_instance_id }}</td>
+                        <td>{{ resource_instance.instance.instance_name }}</td>
+                        <td>{{ resource_instance.instance.get_db_type_display|default:'-' }}</td>
+                        <td>{% if resource_instance.idc %}{{ resource_instance.idc.idc_name }}{% else %}-{% endif %}</td>
+                        <td>{% if resource_instance.server %}{{ resource_instance.server.server_name }}{% else %}-{% endif %}</td>
+                        <td>{% if resource_instance.cluster %}{{ resource_instance.cluster.cluster_name }}{% else %}-{% endif %}</td>
+                        <td>{% if resource_instance.project %}{{ resource_instance.project.project_name }}{% else %}-{% endif %}</td>
+                        <td>
+                            {% if resource_instance.instance_env == 'production' %}
+                                <span class="label label-danger">生产</span>
+                            {% elif resource_instance.instance_env == 'test' %}
+                                <span class="label label-warning">测试</span>
+                            {% else %}
+                                <span class="label label-info">开发</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if resource_instance.instance_level == 1 %}
+                                <span class="label label-danger">核心</span>
+                            {% elif resource_instance.instance_level == 2 %}
+                                <span class="label label-warning">重要</span>
+                            {% else %}
+                                <span class="label label-info">一般</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ resource_instance.create_time|date:'Y-m-d H:i:s' }}</td>
+                        <td>
+                            <button type="button" class="btn btn-xs btn-primary"
+                                    onclick="window.location.href='/resource/instance/edit/{{ resource_instance.resource_instance_id }}/'">
+                                编辑
+                            </button>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="11" class="text-center">暂无数据</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 分页 -->
+    {% if resource_instance_list.has_other_pages %}
+        <ul class="pagination">
+            {% if resource_instance_list.has_previous %}
+                <li><a href="?page={{ resource_instance_list.previous_page_number }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if idc_id %}&idc_id={{ idc_id }}{% endif %}{% if project_id %}&project_id={{ project_id }}{% endif %}">&laquo;</a></li>
+            {% else %}
+                <li class="disabled"><span>&laquo;</span></li>
+            {% endif %}
+            {% for i in resource_instance_list.paginator.page_range %}
+                {% if resource_instance_list.number == i %}
+                    <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                {% else %}
+                    <li><a href="?page={{ i }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if idc_id %}&idc_id={{ idc_id }}{% endif %}{% if project_id %}&project_id={{ project_id }}{% endif %}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if resource_instance_list.has_next %}
+                <li><a href="?page={{ resource_instance_list.next_page_number }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if idc_id %}&idc_id={{ idc_id }}{% endif %}{% if project_id %}&project_id={{ project_id }}{% endif %}">&raquo;</a></li>
+            {% else %}
+                <li class="disabled"><span>&raquo;</span></li>
+            {% endif %}
+        </ul>
+    {% endif %}
+{% endblock content %}
+
+{% block js %}
+    <script>
+        function searchResourceInstance() {
+            var keyword = $('#keyword').val();
+            var idc_id = $('#idc_id').val();
+            var project_id = $('#project_id').val();
+            var url = window.location.pathname;
+            var params = {};
+            if (keyword) {
+                params.keyword = keyword;
+            }
+            if (idc_id) {
+                params.idc_id = idc_id;
+            }
+            if (project_id) {
+                params.project_id = project_id;
+            }
+            window.location.href = url + '?' + $.param(params);
+        }
+    </script>
+{% endblock js %}
