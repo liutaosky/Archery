@@ -69,9 +69,9 @@ class InstanceTagAdmin(admin.ModelAdmin):
 @admin.register(Instance)
 class InstanceAdmin(admin.ModelAdmin):
     form = InstanceForm
-    list_display = ('id', 'instance_name', 'db_type', 'type', 'host', 'port', 'user', 'create_time')
+    list_display = ('id', 'instance_name', 'db_type', 'type', 'host', 'port', 'cluster', 'user', 'create_time')
     search_fields = ['instance_name', 'host', 'port', 'user']
-    list_filter = ('db_type', 'type', 'instance_tag')
+    list_filter = ('db_type', 'type', 'instance_tag', 'cluster')
 
     def formfield_for_dbfield(self, db_field, **kwargs):
         if db_field.name == 'password':
@@ -298,11 +298,10 @@ class ProjectAdmin(admin.ModelAdmin):
 
 @admin.register(Cluster)
 class ClusterAdmin(admin.ModelAdmin):
-    list_display = ('cluster_id', 'cluster_name', 'cluster_code', 'project', 'cluster_type', 'cluster_role', 'cluster_status', 'create_time')
+    list_display = ('cluster_id', 'cluster_name', 'cluster_code', 'project', 'server', 'cluster_type', 'cluster_role', 'cluster_status', 'create_time')
     search_fields = ('cluster_name', 'cluster_code')
-    list_filter = ('project', 'cluster_type', 'cluster_role', 'cluster_status')
+    list_filter = ('project', 'server', 'cluster_type', 'cluster_role', 'cluster_status')
     list_display_links = ('cluster_id', 'cluster_name')
-    filter_horizontal = ('servers',)
 
 
 @admin.register(ResourceInstance)
