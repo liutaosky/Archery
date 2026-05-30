@@ -1066,38 +1066,38 @@ class ResourceInstance(models.Model):
         verbose_name_plural = u'实例资源关联'
 
 
-# 扩展Permission类，添加资源管理相关权限
+# 扩展Permission类，添加资源管理相关权限（已临时注释用于演示）
 # 更新原有的Permission类，添加资源管理权限
-if not hasattr(Permission, 'resource_permissions_added'):
-    # 获取原有的permissions
-    original_permissions = list(Permission.Meta.permissions)
-    # 添加资源管理权限
-    original_permissions.extend([
-        ('menu_resource', '菜单 资源管理'),
-        ('menu_idc', '菜单 机房管理'),
-        ('menu_server', '菜单 服务器管理'),
-        ('menu_project', '菜单 项目管理'),
-        ('menu_cluster', '菜单 集群管理'),
-        ('idc_view', '查看机房信息'),
-        ('idc_add', '添加机房'),
-        ('idc_edit', '编辑机房'),
-        ('idc_delete', '删除机房'),
-        ('server_view', '查看服务器信息'),
-        ('server_add', '添加服务器'),
-        ('server_edit', '编辑服务器'),
-        ('server_delete', '删除服务器'),
-        ('project_view', '查看项目信息'),
-        ('project_add', '添加项目'),
-        ('project_edit', '编辑项目'),
-        ('project_delete', '删除项目'),
-        ('cluster_view', '查看集群信息'),
-        ('cluster_add', '添加集群'),
-        ('cluster_edit', '编辑集群'),
-        ('cluster_delete', '删除集群'),
-        ('resource_instance_view', '查看实例资源关联'),
-        ('resource_instance_edit', '编辑实例资源关联'),
-    ])
-    # 重新设置permissions
-    Permission.Meta.permissions = tuple(original_permissions)
-    Permission.resource_permissions_added = True
+# if not hasattr(Permission, 'resource_permissions_added'):
+#     # 获取原有的permissions
+#     original_permissions = list(Permission.Meta.permissions)
+#     # 添加资源管理权限
+#     original_permissions.extend([
+#         ('menu_resource', '菜单 资源管理'),
+#         ('menu_idc', '菜单 机房管理'),
+#         ('menu_server', '菜单 服务器管理'),
+#         ('menu_project', '菜单 项目管理'),
+#         ('menu_cluster', '菜单 集群管理'),
+#         ('idc_view', '查看机房信息'),
+#         ('idc_add', '添加机房'),
+#         ('idc_edit', '编辑机房'),
+#         ('idc_delete', '删除机房'),
+#         ('server_view', '查看服务器信息'),
+#         ('server_add', '添加服务器'),
+#         ('server_edit', '编辑服务器'),
+#         ('server_delete', '删除服务器'),
+#         ('project_view', '查看项目信息'),
+#         ('project_add', '添加项目'),
+#         ('project_edit', '编辑项目'),
+#         ('project_delete', '删除项目'),
+#         ('cluster_view', '查看集群信息'),
+#         ('cluster_add', '添加集群'),
+#         ('cluster_edit', '编辑集群'),
+#         ('cluster_delete', '删除集群'),
+#         ('resource_instance_view', '查看实例资源关联'),
+#         ('resource_instance_edit', '编辑实例资源关联'),
+#     ])
+#     # 重新设置permissions
+#     Permission.Meta.permissions = tuple(original_permissions)
+#     Permission.resource_permissions_added = True
 # ==================== 资源管理模块结束 ====================
