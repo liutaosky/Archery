@@ -164,7 +164,6 @@ class Instance(models.Model):
     charset = models.CharField('字符集', max_length=20, default='', blank=True)
     service_name = models.CharField('Oracle service name', max_length=50, null=True, blank=True)
     sid = models.CharField('Oracle sid', max_length=50, null=True, blank=True)
-    cluster = models.ForeignKey('Cluster', verbose_name='所属集群', on_delete=models.CASCADE, null=True, blank=True)
     resource_group = models.ManyToManyField(ResourceGroup, verbose_name='资源组', blank=True)
     instance_tag = models.ManyToManyField(InstanceTag, verbose_name='实例标签', blank=True)
     tunnel = models.ForeignKey(Tunnel, verbose_name='连接隧道', blank=True, null=True, on_delete=models.CASCADE, default=None)
@@ -1016,7 +1015,6 @@ class Cluster(models.Model):
     cluster_name = models.CharField('集群名称', max_length=100, unique=True)
     cluster_code = models.CharField('集群编码', max_length=50, unique=True)
     project = models.ForeignKey(Project, verbose_name='所属项目', on_delete=models.CASCADE)
-    server = models.ForeignKey(Server, verbose_name='所属服务器', on_delete=models.CASCADE, null=True, blank=True)
     cluster_type = models.CharField('集群类型', max_length=50, choices=(
         ('mysql', 'MySQL'), ('redis', 'Redis'), ('mongo', 'MongoDB'),
         ('pgsql', 'PostgreSQL'), ('oracle', 'Oracle'), ('other', '其他')
@@ -1024,6 +1022,7 @@ class Cluster(models.Model):
     cluster_role = models.CharField('集群角色', max_length=50, choices=(
         ('production', '生产环境'), ('test', '测试环境'), ('dev', '开发环境')
     ), default='production')
+    servers = models.ManyToManyField(Server, verbose_name='包含服务器', blank=True)
     cluster_status = models.IntegerField('状态', choices=((0, '停用'), (1, '启用')), default=1)
     cluster_remark = models.TextField('备注', blank=True)
     create_time = models.DateTimeField('创建时间', auto_now_add=True)
