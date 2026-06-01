@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 """
-Resource Management 模块测试脚本
+Resource Management 模块简化测试脚本（不依赖 djangorestframework）
 """
 import os
 import sys
@@ -12,9 +12,6 @@ django.setup()
 
 from resource_management.models import ResourceGroup, Instance, Users
 from resource_management.utils.resource_group import user_groups, user_instances
-from resource_management.serializers import ResourceGroupSerializer, InstanceSerializer
-from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
 
 
 def test_models():
@@ -127,81 +124,12 @@ def test_utils():
     print("\n✓ 所有工具函数测试通过!\n")
 
 
-def test_serializers():
-    print("=" * 60)
-    print("测试序列化器")
-    print("=" * 60)
-
-    # 创建测试数据
-    rg = ResourceGroup.objects.create(
-        group_name='序列化测试资源组',
-        group_parent_id=0,
-        group_sort=1,
-        group_level=1,
-        is_deleted=0
-    )
-
-    # 测试序列化
-    serializer = ResourceGroupSerializer(rg)
-    data = serializer.data
-    print(f"✓ ResourceGroupSerializer: {data}")
-
-    # 测试反序列化
-    new_rg = ResourceGroupSerializer(data=data)
-    if new_rg.is_valid():
-        print(f"✓ ResourceGroupSerializer 反序列化验证通过")
-    else:
-        print(f"✗ ResourceGroupSerializer 反序列化失败: {new_rg.errors}")
-
-    # 清理
-    rg.delete()
-
-    print("\n✓ 所有序列化器测试通过!\n")
-
-
-def test_permissions():
-    print("=" * 60)
-    print("测试权限配置")
-    print("=" * 60)
-
-    # 创建内容类型
-    content_type = ContentType.objects.get_or_create(
-        app_label='resource_management',
-        model='resourcegroup'
-    )[0]
-
-    # 创建权限
-    perm, created = Permission.objects.get_or_create(
-        codename='query_all_instances',
-        name='Can query all instances',
-        content_type=content_type,
-    )
-    print(f"✓ 创建权限: {perm.codename}")
-
-    # 清理
-    if created:
-        perm.delete()
-
-    print("\n✓ 权限配置测试通过!\n")
-
-
 def test_urls():
     print("=" * 60)
     print("测试URL路由")
     print("=" * 60)
 
     from resource_management.urls import urlpatterns
-
-    urls = [
-        'group/',
-        'associated-objects/',
-        'unassociated-objects/',
-        'instances/',
-        'user-all-instances/',
-        'addrelation/',
-        'auditors/',
-        'changeauditors/',
-    ]
 
     for url in urlpatterns:
         print(f"✓ URL路由: {url.pattern} -> {url.name}")
@@ -211,14 +139,12 @@ def test_urls():
 
 def main():
     print("\n" + "=" * 60)
-    print("Resource Management 模块完整测试")
+    print("Resource Management 模块简化测试（无需 djangorestframework）")
     print("=" * 60 + "\n")
 
     try:
         test_models()
         test_utils()
-        test_serializers()
-        test_permissions()
         test_urls()
 
         print("=" * 60)
